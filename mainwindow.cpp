@@ -18,3 +18,9 @@ MainWindow::~MainWindow()
 {
     delete ui;
 }
+
+void MainWindow::on_actionConnect_to_a_server_triggered()
+{
+    this->tilemapTownClient.network_connect("novasquirrel.com", "/townws_test/", "443");
+}
+

@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include "town.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -14,8 +15,13 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
+    TilemapTownClient tilemapTownClient;
+
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+
+private slots:
+    void on_actionConnect_to_a_server_triggered();
 
 private:
     Ui::MainWindow *ui;
