@@ -22,7 +22,7 @@
 using namespace std;
 
 void TilemapTownClient::log_message(std::string text, std::string style) {
-    puts(text.c_str());
+    this->ui->chatLog->append(QString::fromStdString((text)));
 }
 
 void TownMap::init_map(int width, int height) {
@@ -165,6 +165,7 @@ Entity *TilemapTownClient::your_entity() {
     return &(*it).second;
 }
 
+#ifdef __3DS__
 void TilemapTownClient::update_camera(float offset_x, float offset_y) {
     Entity *you = this->your_entity();
     if(!you)
@@ -181,6 +182,7 @@ void TilemapTownClient::update_camera(float offset_x, float offset_y) {
     if(fabs(difference_y) > 0.5)
         this->camera_y += difference_y / 12;
 }
+#endif
 
 void TilemapTownClient::turn_player(int direction) {
     Entity *you = this->your_entity();

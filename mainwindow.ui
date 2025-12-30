@@ -83,7 +83,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QPlainTextEdit" name="textInput">
+          <widget class="ChatTextInput" name="textInput">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
              <horstretch>0</horstretch>
@@ -147,7 +147,7 @@
     <property name="title">
      <string>Help</string>
     </property>
-    <addaction name="actioContents"/>
+    <addaction name="actionContents"/>
     <addaction name="actionAbout"/>
     <addaction name="actionCheck_for_updates"/>
     <addaction name="separator"/>
@@ -235,7 +235,7 @@
     <string>Debug info</string>
    </property>
   </action>
-  <action name="actioContents">
+  <action name="actionContents">
    <property name="text">
     <string>Contents</string>
    </property>
@@ -350,6 +350,14 @@
    <extends>QWidget</extends>
    <header location="global">QTabBar</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>ChatTextInput</class>
+   <extends>QPlainTextEdit</extends>
+   <header>chattextinput.h</header>
+   <slots>
+    <signal>returnPressed()</signal>
+   </slots>
   </customwidget>
  </customwidgets>
  <resources/>

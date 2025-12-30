@@ -22,6 +22,7 @@ public:
 
 private slots:
     void on_actionConnect_to_a_server_triggered();
+    void on_textInput_returnPressed();
 
 private:
     Ui::MainWindow *ui;

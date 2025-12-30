@@ -106,9 +106,14 @@ void network_finish() {
 
 #ifdef USING_QT
 int TilemapTownClient::network_connect(std::string host, std::string path, std::string port) {
+    this->websocket.disconnect();
     connect(&this->websocket, &QWebSocket::connected, this, &TilemapTownClient::onWebSocketConnected);
+    connect(&this->websocket, &QWebSocket::disconnected, this, &TilemapTownClient::onWebSocketDisconnected);
+    connect(&this->websocket, &QWebSocket::errorOccurred, this, &TilemapTownClient::onWebSocketError);
     connect(&this->websocket, QOverload<const QList<QSslError>&>::of(&QWebSocket::sslErrors),
             this, &TilemapTownClient::onWebSocketSslErrors);
+    connect(&this->websocket, &QWebSocket::textMessageReceived,
+            this, &TilemapTownClient::onWebSocketTextMessageReceived);
 
     this->websocket.open(QString::fromStdString("wss://" + host + path + ":" + port));
     return 1;
@@ -119,10 +124,16 @@ void TilemapTownClient::network_disconnect() {
 }
 
 void TilemapTownClient::onWebSocketConnected() {
-    qDebug() << "WebSocket connected";
-    connect(&this->websocket, &QWebSocket::textMessageReceived,
-            this, &TilemapTownClient::onWebSocketTextMessageReceived);
+    this->connected = true;
     this->login("qt", nullptr);
+}
+
+void TilemapTownClient::onWebSocketDisconnected() {
+    this->connected = false;
+}
+
+void TilemapTownClient::onWebSocketError(QAbstractSocket::SocketError error) {
+    qWarning() << "Websocket error:" << error;
 }
 
 void TilemapTownClient::onWebSocketTextMessageReceived(QString message) {

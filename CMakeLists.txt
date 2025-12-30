@@ -6,7 +6,7 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 add_definitions(-DUSING_QT)
@@ -36,6 +36,7 @@ find_package(Qt6 REQUIRED COMPONENTS Widgets Network WebSockets)
         cJSON.cpp cJSON.h
         protocol.cpp
         network.cpp
+        chattextinput.h chattextinput.cpp
 
     )
 # Define target properties for Android with Qt 6 as:

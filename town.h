@@ -46,15 +46,15 @@
 #include "mbedtls/timing.h"
 #endif
 
+#ifdef __3DS__
 #define VIEW_WIDTH_TILES 25
 #define VIEW_HEIGHT_TILES 15
-
-#ifdef __3DS__
 #include <3ds.h>
 #include <citro2d.h>
 #elif defined(USING_QT)
 #include <qpixmap.h>
 #include <QtWebSockets/QWebSocket>
+#include "ui_mainwindow.h"
 #endif
 
 class TilemapTownClient;
@@ -297,8 +297,11 @@ public:
     unsigned int get_obj_autotile_index_4(MapTileInfo *obj, int x, int y);
     std::shared_ptr<MapTileInfo> get_shared_pointer_to_tile(MapTileInfo *tile);
 #ifdef USING_QT
+    Ui::MainWindow *ui;
 private Q_SLOTS:
     void onWebSocketConnected();
+    void onWebSocketDisconnected();
+    void onWebSocketError(QAbstractSocket::SocketError error);
     void onWebSocketTextMessageReceived(QString message);
     void onWebSocketSslErrors(const QList<QSslError> &errors);
 #endif

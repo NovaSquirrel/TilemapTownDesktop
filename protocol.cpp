@@ -19,6 +19,7 @@
 #include "town.h"
 #include "cJSON.h"
 #include <stdarg.h>
+#include <format>
 
 #define protocol_command_as_int(a,b,c) (a) | (b<<8) | (c<<16)
 
@@ -124,6 +125,29 @@ uint32_t town_crc32(const void *buf, size_t size) {
     while (size--)
         crc = crc32_tab[(crc ^ *p++) & 0xFF] ^ (crc >> 8);
     return crc ^ ~0U;
+}
+
+void html_encode(std::string& out, const char *in) {
+    if (in == nullptr)
+        return;
+    out.clear();
+    out.reserve(strlen(in));
+    for (const char *c = in; *c; c++) {
+        switch(*c) {
+        case '&':
+            out.append("&amp;");
+            break;
+        case '<':
+            out.append("&lt;");
+            break;
+        case '>':
+            out.append("&gt;");
+            break;
+        default:
+            out.push_back(*c);
+            break;
+        }
+    }
 }
 
 const char *get_json_string(cJSON *json, const char *name) {
@@ -814,26 +838,28 @@ void TilemapTownClient::websocket_message(const char *text, size_t length) {
 
     case protocol_command_as_int('P', 'R', 'I'):
     {
-        const char *i_text = get_json_string(json, "text");
-        const char *i_name = get_json_string(json, "name");
+        std::string i_text, i_name;
+        html_encode(i_text, get_json_string(json, "text"));
+        html_encode(i_name, get_json_string(json, "name"));
         cJSON *i_username = get_json_item(json, "username");
         cJSON *i_receive  = get_json_item(json, "receive");
 
-        if(!i_text || !i_name || !i_username || !i_receive)
+        if(i_text.empty() || i_name.empty() || !i_username || !i_receive)
             break;
-        std::string username = json_as_string(i_username);
+        std::string username;
+        html_encode(username, json_as_string(i_username).c_str());
         bool b_receive = cJSON_IsTrue(i_receive);
-        printf("\x1b[32m%s[%s(%s)] %s\x1b[0m\n", b_receive?"<--":"-->", i_name, username.c_str(), i_text);
-        fflush(stdout);
+        this->log_message(std::format("<span style=\"color:lime;\">{}[{}({})] {}</span>", b_receive?"←":"→", i_name, username, i_text), "private_message");
         break;
     }
 
     case protocol_command_as_int('E', 'R', 'R'):
     {
-        const char *i_text = get_json_string(json, "text");
-        if(i_text)
-            printf("\x1b[31m%s\x1b[0m\n", i_text);
-        fflush(stdout);
+        std::string i_text;
+        html_encode(i_text, get_json_string(json, "text"));
+        if(!i_text.empty()) {
+            this->log_message(std::format("<span style=\"color:red;\">{}</span>", i_text), "error");
+        }
         break;
     }
 
@@ -842,26 +868,27 @@ void TilemapTownClient::websocket_message(const char *text, size_t length) {
     {
         // <-- MSG {"text": "[text]", "name": speaker, "class": classname, "username": username}
         // <-- MSG {"text": "[text]", "name": speaker, "class": classname, "buttons": ["name 1", "command 1", "name 2", "command 2"]}
-        const char *i_text  = get_json_string(json, "text");
-        const char *i_name  = get_json_string(json, "name");
+        std::string i_text, i_name;
+        html_encode(i_text, get_json_string(json, "text"));
+        html_encode(i_name, get_json_string(json, "name"));
+
         //const char *i_class = get_json_string(json, "class");
         //cJSON *i_buttons    = get_json_item(json, "buttons");
-        if(i_text) {
-            if(i_name) {
-                if(i_text[0] == '/' && i_text[1] == 'm' && i_text[2] == 'e' && i_text[3] == ' ') {
-                    printf("* %s %s\n", i_name, i_text+4);
-                } else if(i_text[0] == '/' && i_text[1] == 'o' && i_text[2] == 'o' && i_text[3] == 'c' && i_text[4] == ' ') {
-                    printf("\x1b[34m[OOC] %s: %s\x1b[0m\n", i_name, i_text+5);
-                } else if(i_text[0] == '/' && i_text[1] == 's' && i_text[2] == 'p' && i_text[3] == 'o' && i_text[4] == 'o' && i_text[5] == 'f' && i_text[6] == ' ') {
-                    printf("* %s \x1b[34m(by %s)\x1b[0m\n", i_text+7, i_name);
+        if(!i_text.empty()) {
+            if(!i_name.empty()) {
+                if(i_text.starts_with("/me ")) {
+                    this->log_message(std::format("* <i>{} {}</i>", i_name, i_text.c_str()+4), "user_message");
+                } else if(i_text.starts_with("/ooc ")) {
+                    this->log_message(std::format("<span style=\"color:silver;\">[OOC]: {}: {}</span>", i_name, i_text.c_str()+5), "user_message");
+                } else if(i_text.starts_with("/spoof ")) {
+                    this->log_message(std::format("* {} <span style=\"font-size: 10px; color:silver;\">(by {})</span>", i_text.c_str()+7, i_name), "user_message");
                 } else {
-                    printf("<%s> %s\n", i_name, i_text);
+                    this->log_message(std::format("&lt;{}&gt; {}", i_name, i_text), "user_message");
                 }
             } else {
-                printf("\x1b[35m%s\x1b[0m\n", i_text);
+                this->log_message(std::format("<span style=\"color:pink;\">{}</span>", i_text), "server_message");
             }
         }
-        fflush(stdout);
         break;
     }
     }
