@@ -54,7 +54,6 @@
 #elif defined(USING_QT)
 #include <qpixmap.h>
 #include <QtWebSockets/QWebSocket>
-#include "ui_mainwindow.h"
 #endif
 
 class TilemapTownClient;
@@ -283,7 +282,6 @@ public:
     void network_update();
 
     void request_image_asset(std::string key);
-    void log_message(std::string text, std::string style);
     void update_camera(float offset_x, float offset_y);
     void draw_map(int camera_x, int camera_y);
     Entity *your_entity();
@@ -296,8 +294,12 @@ public:
     unsigned int get_turf_autotile_index_4(MapTileInfo *turf, int x, int y);
     unsigned int get_obj_autotile_index_4(MapTileInfo *obj, int x, int y);
     std::shared_ptr<MapTileInfo> get_shared_pointer_to_tile(MapTileInfo *tile);
-#ifdef USING_QT
-    Ui::MainWindow *ui;
+#ifndef USING_QT
+    void log_message(const std::string text, const std::string style);
+#else
+signals:
+    void log_message(const std::string text, const std::string style);
+
 private Q_SLOTS:
     void onWebSocketConnected();
     void onWebSocketDisconnected();

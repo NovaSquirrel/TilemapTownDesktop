@@ -21,10 +21,6 @@
 
 using namespace std;
 
-void TilemapTownClient::log_message(std::string text, std::string style) {
-    this->ui->chatLog->append(QString::fromStdString((text)));
-}
-
 void TownMap::init_map(int width, int height) {
     this->width = width;
     this->height = height;
@@ -356,3 +352,9 @@ void Entity::update_direction(int direction) {
     if(direction == 0 || direction == 4) // Left and right only
         this->direction_lr = direction;
 }
+
+#ifndef USING_QT
+void TilemapTownClient::log_message(std::string text, std::string style) {
+    puts(text);
+}
+#endif

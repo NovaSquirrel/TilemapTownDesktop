@@ -23,6 +23,7 @@ public:
 private slots:
     void on_actionConnect_to_a_server_triggered();
     void on_textInput_returnPressed();
+    void logMessage(std::string text, std::string style);
 
 private:
     Ui::MainWindow *ui;

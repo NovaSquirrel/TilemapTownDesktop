@@ -6,7 +6,9 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
-    this->tilemapTownClient.ui = this->ui;
+    connect(&this->tilemapTownClient, &TilemapTownClient::log_message, this, &MainWindow::logMessage);
+    ui->tilemapTownMapView->tilemapTownClient = &this->tilemapTownClient;
+
     ui->setupUi(this);
     ui->tabCharacters->addTab("Character");
 
@@ -50,3 +52,6 @@ void MainWindow::on_textInput_returnPressed()
     ui->textInput->clear();
 }
 
+void MainWindow::logMessage(std::string text, std::string style) {
+    ui->chatLog->append(QString::fromStdString((text)));
+}
