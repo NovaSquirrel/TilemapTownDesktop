@@ -407,7 +407,28 @@ bool TilemapTownClient::calc_pic_quarters(int quarter_x[4], int quarter_y[4], co
              {{0, 6},{1, 6},{0, 7},{1, 7}}, {{0, 0},{1, 6},{0, 1},{1, 7}},
              {{0, 6},{1, 0},{0, 7},{1, 1}}, {{0, 0},{1, 0},{0, 1},{1, 1}}};
 
+        if (tile->autotile_layout == 12 || tile->autotile_layout == 13) {
+            quarter_x[0] = offsets_8[autotile_index][0][0];
+            quarter_x[1] = offsets_8[autotile_index][1][0];
+            quarter_x[2] = offsets_8[autotile_index][2][0];
+            quarter_x[3] = offsets_8[autotile_index][3][0];
+            quarter_y[0] = offsets_8[autotile_index][0][1];
+            quarter_y[1] = offsets_8[autotile_index][1][1];
+            quarter_y[2] = offsets_8[autotile_index][2][1];
+            quarter_y[3] = offsets_8[autotile_index][3][1];
+        } else {
+            quarter_x[0] = offsets_16[autotile_index][0][0];
+            quarter_x[1] = offsets_16[autotile_index][1][0];
+            quarter_x[2] = offsets_16[autotile_index][2][0];
+            quarter_x[3] = offsets_16[autotile_index][3][0];
+            quarter_y[0] = offsets_16[autotile_index][0][1];
+            quarter_y[1] = offsets_16[autotile_index][1][1];
+            quarter_y[2] = offsets_16[autotile_index][2][1];
+            quarter_y[3] = offsets_16[autotile_index][3][1];
+        }
+
         // Add the inner parts of turns
+
         if(((autotile_index &  5) ==  5)
             && !(obj ? this->is_obj_autotile_match(tile, map, map_x-1, map_y-1)
                      : this->is_turf_autotile_match(tile, map, map_x-1, map_y-1))) {
@@ -431,6 +452,13 @@ bool TilemapTownClient::calc_pic_quarters(int quarter_x[4], int quarter_y[4], co
                      : this->is_turf_autotile_match(tile, map, map_x+1, map_y+1))) {
             quarter_x[3] = 1;
             quarter_y[3] = 5;
+        }
+
+        if (tile->autotile_layout == 13 || tile->autotile_layout == 15) {
+            quarter_y[0] -= 2;
+            quarter_y[1] -= 2;
+            quarter_y[2] -= 2;
+            quarter_y[3] -= 2;
         }
 
         // Change quarter_x and quarter_y from offset to actual pic quarter coordinates

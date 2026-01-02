@@ -1,15 +1,10 @@
 #include "townfilecache.h"
 
-#include <stdio.h>
-
 TownFileCache::TownFileCache() {
     connect(&this->network_access_manager, &QNetworkAccessManager::finished, this, &TownFileCache::onFileDownloaded);
 }
 
 void TownFileCache::onFileDownloaded(QNetworkReply* reply) {
-    puts("Got a file!");
-    fflush(stdout);
-
     QPixmap image;
     image.loadFromData(reply->readAll());
     this->image_for_url[reply->url().toString().toStdString()] = image;
@@ -25,9 +20,6 @@ QPixmap *TownFileCache::get_pixmap(const std::string &url) {
             return nullptr;
         }
         this->requested_urls.insert(url);
-
-        printf("I want a file: %s\n", url.c_str());
-        fflush(stdout);
 
         QNetworkRequest request((QUrl(QString::fromStdString(url))));
         this->network_access_manager.get(request);
