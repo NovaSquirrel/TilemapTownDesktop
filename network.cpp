@@ -105,7 +105,7 @@ void network_finish() {
 // ----------------------------------------------
 
 #ifdef USING_QT
-int TilemapTownClient::network_connect(std::string host, std::string path, std::string port) {
+int TilemapTownClient::websocket_connect(std::string host, std::string path, std::string port) {
     this->websocket.disconnect();
     connect(&this->websocket, &QWebSocket::connected, this, &TilemapTownClient::onWebSocketConnected);
     connect(&this->websocket, &QWebSocket::disconnected, this, &TilemapTownClient::onWebSocketDisconnected);
@@ -119,7 +119,7 @@ int TilemapTownClient::network_connect(std::string host, std::string path, std::
     return 1;
 }
 
-void TilemapTownClient::network_disconnect() {
+void TilemapTownClient::websocket_disconnect() {
     this->websocket.close();
 }
 

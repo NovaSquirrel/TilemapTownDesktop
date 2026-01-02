@@ -19,6 +19,8 @@
 #ifndef TOWN_H
 #define TOWN_H
 
+#include "townfilecache.h"
+
 #include <memory>
 #include <vector>
 #include <string>
@@ -33,7 +35,6 @@
 #include <time.h>
 
 #ifndef USING_QT
-#include <curl/curl.h>
 #include <wslay/wslay.h>
 
 #include "mbedtls/platform.h"
@@ -57,22 +58,6 @@
 #endif
 
 class TilemapTownClient;
-
-#ifndef USING_QT
-struct http_file {
-    uint8_t *memory;
-    size_t size;
-    time_t last_accessed;
-};
-
-struct http_transfer {
-    struct http_file file;
-    const char *url;
-
-    void (*callback) (const char *url, uint8_t *data, size_t size, TilemapTownClient *client, void *userdata);
-    void *userdata;
-};
-#endif
 
 // ------------------------------------
 struct MapTileInfo;
@@ -109,44 +94,20 @@ public:
     void init_map(int width, int height);
 };
 
-struct LoadedTextureInfo {
-    int original_width;  // Width of the source image, rather than the texture
-    int original_height;
-#ifdef __3DS__
-#define MULTI_TEXTURE_CELL_WIDTH 512
-#define MULTI_TEXTURE_CELL_HEIGHT 512
-#define MULTI_TEXTURE_CELL_WIDTH_IN_TILES (512/16)
-#define MULTI_TEXTURE_CELL_HEIGHT_IN_TILES (512/16)
-#define MULTI_TEXTURE_COLUMNS 4
-#define MULTI_TEXTURE_ROWS 4
-    C3D_Tex* texture[MULTI_TEXTURE_COLUMNS][MULTI_TEXTURE_ROWS];
-
-    bool image_for_xy(C2D_Image *image, Tex3DS_SubTexture *subtexture, int tile_x, int tile_y, bool quadrant);
-#elif defined(USING_QT)
-    QPixmap pixmap;
-#endif
-};
 
 struct Pic {
     std::string key; // URL or integer
     int x;
     int y;
-
-    bool ready_to_draw; // Map tile has the texture loaded in
+    bool key_is_url() const;
 
 #ifdef __3DS__
-    Tex3DS_SubTexture subtexture;
-    C2D_Image image;               // Texture and subtexture
-    LoadedTextureInfo *extra_info; // Can use this to get the original size, or the other textures this PNG was turned into
-
-    C2D_Image *get(TilemapTownClient *client);
-    LoadedTextureInfo *get_texture(TilemapTownClient *client);
+    MultiTextureInfo *get_textures(TilemapTownClient *client) const;
 #elif defined(USING_QT)
-    QPixmap *get(TilemapTownClient *client);
-    LoadedTextureInfo *get_texture(TilemapTownClient *client);
+    const QPixmap *get_pixmap(TilemapTownClient *client) const;
 #endif
 
-    std::size_t hash();
+    std::size_t hash() const;
 };
 
 class Entity {
@@ -200,28 +161,10 @@ struct MapTileInfo {
     bool obj;
     enum MapTileType type;
 
-    std::size_t hash();
+    std::size_t hash() const;
 };
 
 // ------------------------------------
-
-#ifndef USING_QT
-class HttpFileCache {
-    std::unordered_map<std::string, struct http_file> cache;
-    CURLM *http;
-    std::unordered_set<std::string> requested_urls;
-    bool http_in_progress;
-    size_t total_size;
-
-public:
-    TilemapTownClient *client;
-    HttpFileCache();
-    ~HttpFileCache();
-
-    void get(std::string url, void (*callback) (const char *url, uint8_t *data, size_t size, TilemapTownClient *client, void *userdata), void *userdata);
-    void run_transfers();
-};
-#endif
 
 class TilemapTownClient
 #ifdef USING_QT
@@ -246,20 +189,18 @@ class TilemapTownClient
 #endif
 
 public:
+    TownFileCache *http;
     bool connected;
 
     // Game state
     TownMap town_map;
-    std::unordered_map<std::size_t, std::weak_ptr<MapTileInfo>> json_tileset; // Custom JSON tiles, referenced by hash
     std::unordered_map<std::string, Entity> who;
+    std::unordered_map<std::size_t, std::weak_ptr<MapTileInfo>> json_tileset; // Custom JSON tiles, referenced by hash
 
-    std::unordered_map<std::string, LoadedTextureInfo> texture_for_url; // Downloaded and read image
-    std::unordered_set<std::string> requested_image_urls; // HTTP request already sent
-
-    std::unordered_map<std::string, std::string> url_for_tile_sheet; // Information from IMG and RSC
+    std::unordered_map<std::string, std::string> url_for_tile_sheet; // From RSC and IMG
     std::unordered_set<std::string> requested_tile_sheets; // IMG already sent
 
-    std::unordered_map<std::string, std::shared_ptr<MapTileInfo>> tileset;
+    std::unordered_map<std::string, std::shared_ptr<MapTileInfo>> tileset; // From RSC and TSD
     std::unordered_set<std::string> requested_tilesets; // TSD already sent
 
     bool map_received;
@@ -270,36 +211,46 @@ public:
     std::string your_id;
     float camera_x;
     float camera_y;
-
     bool walk_through_walls;
 
+    // Websocket functions
+    int websocket_connect(std::string host, std::string path, std::string port);
+    void websocket_disconnect();
+    void network_update(); // Does nothing on Qt; on other platforms, it also runs HTTP transfers
     void websocket_write(std::string text);
     void websocket_write(std::string command, cJSON *json);
     void websocket_message(const char *text, size_t length);
-    void login(const char *username, const char *password);
-    int network_connect(std::string host, std::string path, std::string port);
-    void network_disconnect();
-    void network_update();
 
-    void request_image_asset(std::string key);
     void update_camera(float offset_x, float offset_y);
     void draw_map(int camera_x, int camera_y);
     Entity *your_entity();
+
+    // Utilties to send protocol messages
+    void login(const char *username, const char *password);
     void turn_player(int direction);
     void move_player(int offset_x, int offset_y);
+    void request_image_asset(std::string key);
+    void request_tileset_asset(std::string key);
 
-    // Utility
-    bool is_turf_autotile_match(MapTileInfo *turf, int x, int y);
-    bool is_obj_autotile_match(MapTileInfo *obj, int x, int y);
-    unsigned int get_turf_autotile_index_4(MapTileInfo *turf, int x, int y);
-    unsigned int get_obj_autotile_index_4(MapTileInfo *obj, int x, int y);
-    std::shared_ptr<MapTileInfo> get_shared_pointer_to_tile(MapTileInfo *tile);
+    // Autotile utilities
+    bool is_turf_autotile_match(const MapTileInfo *turf, TownMap *map, int map_x, int map_y);
+    bool is_obj_autotile_match(const MapTileInfo *obj, TownMap *map, int map_x, int map_y);
+    unsigned int get_turf_autotile_index_4(const MapTileInfo *turf, TownMap *map, int map_x, int map_y);
+    unsigned int get_obj_autotile_index_4(const MapTileInfo *obj, TownMap *map, int map_x, int map_y);
+    bool calc_pic_quarters(int quarter_x[4], int quarter_y[4], const MapTileInfo *tile, bool obj, TownMap *map, int map_x, int map_y, int tenth_of_second_counter);
+
+    // Miscellaneous utilities
+    std::shared_ptr<MapTileInfo> get_shared_pointer_to_tile(MapTileInfo *tile); // Get cached copy from json_tileset, or cache the tile for later use
+
+    // Displaying messages involves the protocol code initiating a UI change - for Qt, this is done with a signal,
+    // but on other platforms it may involve writing to global state somewhere.
 #ifndef USING_QT
-    void log_message(const std::string text, const std::string style);
+    void log_message(const std::string text, const std::string style); // Directly writes to the chat log
 #else
 signals:
-    void log_message(const std::string text, const std::string style);
+    void log_message(const std::string text, const std::string style); // Sends a signal to the chat log
 
+    // Handle websocket events
 private Q_SLOTS:
     void onWebSocketConnected();
     void onWebSocketDisconnected();

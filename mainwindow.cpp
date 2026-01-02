@@ -7,7 +7,7 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     connect(&this->tilemapTownClient, &TilemapTownClient::log_message, this, &MainWindow::logMessage);
-    ui->tilemapTownMapView->tilemapTownClient = &this->tilemapTownClient;
+    this->tilemapTownClient.http = &this->townFileCache;
 
     ui->setupUi(this);
     ui->tabCharacters->addTab("Character");
@@ -25,7 +25,8 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_actionConnect_to_a_server_triggered()
 {
-    this->tilemapTownClient.network_connect("novasquirrel.com", "/townws_test/", "443");
+    this->tilemapTownClient.websocket_connect("novasquirrel.com", "/townws_test/", "443");
+    ui->tilemapTownMapView->tilemapTownClient = &this->tilemapTownClient;
 }
 
 void MainWindow::on_textInput_returnPressed()

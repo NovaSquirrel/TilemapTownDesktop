@@ -777,28 +777,13 @@ void TilemapTownClient::websocket_message(const char *text, size_t length) {
     case protocol_command_as_int('I', 'M', 'G'):
     {
         cJSON *i_id  = get_json_item(json, "id");
-        cJSON *i_update = get_json_item(json, "update");
+        //cJSON *i_update = get_json_item(json, "update");
 
         const char *i_url = get_json_string(json, "url");
         if(i_id) {
             std::string id = json_as_string(i_id);
             this->url_for_tile_sheet[id] = i_url;
             this->requested_tile_sheets.erase(id);
-
-            // Update images that are on preexisting tiles
-            if(cJSON_IsTrue(i_update)) {
-                for (auto &value : this->tileset) {
-                    if((*value.second).pic.key == id) {
-                        (*value.second).pic.ready_to_draw = false;
-                    }
-                }
-                for (auto &value : this->json_tileset) {
-                    std::shared_ptr<MapTileInfo> tile = value.second.lock();
-                    if((*tile).pic.key == id) {
-                        (*tile).pic.ready_to_draw = false;
-                    }
-                }
-            }
         }
         break;
     }
@@ -921,6 +906,18 @@ void TilemapTownClient::request_image_asset(std::string key) {
     cJSON_Delete(json);
 }
 
+void TilemapTownClient::request_tileset_asset(std::string key) {
+    if(this->requested_tilesets.find(key) != this->requested_tilesets.end()) {
+        return;
+    }
+    this->requested_tilesets.insert(key);
+
+    cJSON *json = cJSON_CreateObject();
+    cJSON_AddStringToObject(json, "id", key.c_str());
+    this->websocket_write("TSD", json);
+    cJSON_Delete(json);
+}
+
 void TilemapTownClient::login(const char *username, const char *password) {
     // Build the IDN message to send.
     cJSON *json = cJSON_CreateObject();
@@ -946,12 +943,9 @@ void TilemapTownClient::login(const char *username, const char *password) {
     #ifdef __3DS__
     cJSON_AddStringToObject(json, "client_name", "Tilemap Town 3DS Client");
     #elif defined(USING_QT)
-    cJSON_AddStringToObject(json, "client_name", "Tilemap Town Qt Client");
+    cJSON_AddStringToObject(json, "client_name", "Tilemap Town Desktop Client");
     #endif
 
     this->websocket_write("IDN", json);
     cJSON_Delete(json);
-
-    //this->websocket_write("IDN {\"features\": {\"batch\": {\"version\": \"0.0.1\"}}}");
-    //this->websocket_write("CMD {\"text\": \"nick 3ds\"}");
 }

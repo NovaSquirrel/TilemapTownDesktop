@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include "town.h"
+#include "townfilecache.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -16,6 +17,7 @@ class MainWindow : public QMainWindow
 
 public:
     TilemapTownClient tilemapTownClient;
+    TownFileCache townFileCache;
 
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
