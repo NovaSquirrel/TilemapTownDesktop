@@ -880,9 +880,9 @@ void TilemapTownClient::websocket_message(const char *text, size_t length) {
                 if(i_text.starts_with("/me ")) {
                     this->log_message(std::format("<span style=\"color:white;\">* <i>{} {}</i></span>", i_name, i_text.c_str()+4), "user_message");
                 } else if(i_text.starts_with("/ooc ")) {
-                    this->log_message(std::format("<span style=\"color:silver;\">[OOC]: {}: {}</span>", i_name, i_text.c_str()+5), "user_message");
+                    this->log_message(std::format("<span style=\"color:silver;\">[OOC] {}: {}</span>", i_name, i_text.c_str()+5), "user_message");
                 } else if(i_text.starts_with("/spoof ")) {
-                    this->log_message(std::format("<span style=\"color:white;\">* {} </span><span style=\"font-size: 10px; color:silver;\">(by {})</span>", i_text.c_str()+7, i_name), "user_message");
+                    this->log_message(std::format("<span style=\"color:white;\">* <i>{}</i> </span><span style=\"font-size: 10px; color:silver;\">(by {})</span>", i_text.c_str()+7, i_name), "user_message");
                 } else {
                     this->log_message(std::format("<span style=\"color:white;\">&lt;{}&gt; {}</span>", i_name, i_text), "user_message");
                 }
