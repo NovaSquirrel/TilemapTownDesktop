@@ -430,6 +430,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
    <container>1</container>
    <slots>
     <signal>focusChat()</signal>
+    <signal>movedPlayer()</signal>
    </slots>
   </customwidget>
   <customwidget>

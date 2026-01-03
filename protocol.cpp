@@ -421,7 +421,7 @@ void TilemapTownClient::websocket_message(const char *text, size_t length) {
         this->json_tileset.clear();
         this->map_received = false;
 
-        //cJSON *i_name          = get_json_item(json, "name");
+        cJSON *i_name          = get_json_item(json, "name");
         cJSON *i_id            = get_json_item(json, "id");
         //cJSON *i_owner         = get_json_item(json, "owner");
         //cJSON *i_default       = get_json_item(json, "default");
@@ -438,6 +438,8 @@ void TilemapTownClient::websocket_message(const char *text, size_t length) {
         if(unpack_json_int_array(i_size, 2, &width, &height)) {
             this->town_map.init_map(width, height);
         }
+
+        this->town_map.name = i_name ? json_as_string(i_name) : "";
         if(cJSON_IsNumber(i_id)) {
             this->town_map.id = i_id->valueint;
         } else {
@@ -876,13 +878,13 @@ void TilemapTownClient::websocket_message(const char *text, size_t length) {
         if(!i_text.empty()) {
             if(!i_name.empty()) {
                 if(i_text.starts_with("/me ")) {
-                    this->log_message(std::format("* <i>{} {}</i>", i_name, i_text.c_str()+4), "user_message");
+                    this->log_message(std::format("<span style=\"color:white;\">* <i>{} {}</i></span>", i_name, i_text.c_str()+4), "user_message");
                 } else if(i_text.starts_with("/ooc ")) {
                     this->log_message(std::format("<span style=\"color:silver;\">[OOC]: {}: {}</span>", i_name, i_text.c_str()+5), "user_message");
                 } else if(i_text.starts_with("/spoof ")) {
-                    this->log_message(std::format("* {} <span style=\"font-size: 10px; color:silver;\">(by {})</span>", i_text.c_str()+7, i_name), "user_message");
+                    this->log_message(std::format("<span style=\"color:white;\">* {} </span><span style=\"font-size: 10px; color:silver;\">(by {})</span>", i_text.c_str()+7, i_name), "user_message");
                 } else {
-                    this->log_message(std::format("&lt;{}&gt; {}", i_name, i_text), "user_message");
+                    this->log_message(std::format("<span style=\"color:white;\">&lt;{}&gt; {}</span>", i_name, i_text), "user_message");
                 }
             } else {
                 this->log_message(std::format("<span style=\"color:pink;\">{}</span>", i_text), "server_message");

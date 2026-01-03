@@ -22,7 +22,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->tabChatChannels->setTabsClosable(true);
 
     // Initialize server settings
-    this->websocket_server = "wss://novasquirrel.com/townws_test/:443";
+    this->websocket_server = "wss://novasquirrel.com/townws/:443";
     this->town_nickname = "qt";
     this->town_username = "";
     this->town_password = "";
@@ -98,6 +98,7 @@ void MainWindow::on_actionWalk_through_walls_triggered()
 void MainWindow::want_redraw()
 {
     this->ui->tilemapTownMapView->update();
+    this->on_tilemapTownMapView_movedPlayer();
 }
 
 void MainWindow::on_textInput_returnPressed()
@@ -131,6 +132,15 @@ void MainWindow::on_tilemapTownMapView_focusChat()
     this->ui->textInput->setFocus();
 }
 
+void MainWindow::on_tilemapTownMapView_movedPlayer()
+{
+    if (!this->tilemapTownClient.map_received)
+        return;
+    Entity *me = this->tilemapTownClient.your_entity();
+    if (!me)
+        return;
+    this->ui->statusbar->showMessage(QString::asprintf("%s <%d, %d>", this->tilemapTownClient.town_map.name.c_str(), me->x, me->y));
+}
 
 void MainWindow::logMessage(std::string text, std::string style) {
     std::time_t t = std::time(nullptr);

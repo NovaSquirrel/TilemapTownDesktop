@@ -90,6 +90,7 @@ public:
 
     // Metadata
     int id;
+    std::string name;
 
     void init_map(int width, int height);
 };

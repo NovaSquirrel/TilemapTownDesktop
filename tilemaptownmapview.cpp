@@ -232,6 +232,9 @@ void resetSignFlag(TilemapTownClient *client, QKeyEvent *event) {
 }
 
 void TilemapTownMapView::keyPressEvent(QKeyEvent* event) {
+    if (this->tilemapTownClient == nullptr || !this->tilemapTownClient->map_received) {
+        return;
+    }
     switch (event->key()) {
     case Qt::Key_Left:
     case Qt::Key_A:
@@ -244,6 +247,7 @@ void TilemapTownMapView::keyPressEvent(QKeyEvent* event) {
             this->tilemapTownClient->move_player(-1, 0);
         }
         event->accept();
+        emit this->movedPlayer();
         this->update();
         break;
     case Qt::Key_Right:
@@ -257,6 +261,7 @@ void TilemapTownMapView::keyPressEvent(QKeyEvent* event) {
             this->tilemapTownClient->move_player(1, 0);
         }
         event->accept();
+        emit this->movedPlayer();
         this->update();
         break;
     case Qt::Key_Up:
@@ -270,6 +275,7 @@ void TilemapTownMapView::keyPressEvent(QKeyEvent* event) {
             this->tilemapTownClient->move_player(0, -1);
         }
         event->accept();
+        emit this->movedPlayer();
         this->update();
         break;
     case Qt::Key_Down:
@@ -283,6 +289,7 @@ void TilemapTownMapView::keyPressEvent(QKeyEvent* event) {
             this->tilemapTownClient->move_player(0, 1);
         }
         event->accept();
+        emit this->movedPlayer();
         this->update();
         break;
     case Qt::Key_PageUp:
@@ -295,6 +302,7 @@ void TilemapTownMapView::keyPressEvent(QKeyEvent* event) {
             this->tilemapTownClient->move_player(1, -1);
         }
         event->accept();
+        emit this->movedPlayer();
         this->update();
         break;
     case Qt::Key_PageDown:
@@ -307,6 +315,7 @@ void TilemapTownMapView::keyPressEvent(QKeyEvent* event) {
             this->tilemapTownClient->move_player(1, 1);
         }
         event->accept();
+        emit this->movedPlayer();
         this->update();
         break;
     case Qt::Key_End:
@@ -319,6 +328,7 @@ void TilemapTownMapView::keyPressEvent(QKeyEvent* event) {
             this->tilemapTownClient->move_player(-1, 1);
         }
         event->accept();
+        emit this->movedPlayer();
         this->update();
         break;
     case Qt::Key_Home:
@@ -331,6 +341,7 @@ void TilemapTownMapView::keyPressEvent(QKeyEvent* event) {
             this->tilemapTownClient->move_player(-1, -1);
         }
         event->accept();
+        emit this->movedPlayer();
         this->update();
         break;
     case Qt::Key_Return:

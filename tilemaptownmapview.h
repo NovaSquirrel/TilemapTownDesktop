@@ -37,6 +37,7 @@ private:
     void drawMapTile(QPainter *painter, const MapTileInfo *tiletile, bool obj, int map_x, int map_y, float draw_x, float draw_y, int scale);
 signals:
     void focusChat();
+    void movedPlayer();
 };
 
 #endif // TILEMAPTOWNMAPVIEW_H
