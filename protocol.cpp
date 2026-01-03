@@ -642,7 +642,7 @@ void TilemapTownClient::websocket_message(const char *text, size_t length) {
     case protocol_command_as_int('W', 'H', 'O'):
     {
         cJSON *i_type = get_json_item(json, "type");
-        if(i_type && !strcmp(i_type->valuestring, "map"))
+        if(i_type && strcmp(i_type->valuestring, "map"))
             break;
 
         cJSON *i_you = get_json_item(json, "you");

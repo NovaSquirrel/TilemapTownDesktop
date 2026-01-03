@@ -36,8 +36,7 @@ void MainWindow::on_actionConnect_to_a_server_triggered()
     ui->tilemapTownMapView->tilemapTownClient = &this->tilemapTownClient;
     this->connectToServerDialog.initializeInputFields(this->websocket_server, this->town_nickname, this->town_username, this->town_password, this->guest_mode);
 
-    this->connectToServerDialog.disconnect();
-    connect(&this->connectToServerDialog, &ConnectToServerDialog::returnResults, this, &MainWindow::didConnectToServerDialog);
+    connect(&this->connectToServerDialog, &ConnectToServerDialog::returnResults, this, &MainWindow::didConnectToServerDialog, Qt::UniqueConnection);
     this->connectToServerDialog.show();
 }
 

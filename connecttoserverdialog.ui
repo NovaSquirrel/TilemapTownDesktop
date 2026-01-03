@@ -10,6 +10,12 @@
     <height>211</height>
    </rect>
   </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
   <property name="windowTitle">
    <string>Connect to server</string>
   </property>
@@ -57,6 +63,9 @@
         <property name="text">
          <string>Nickname</string>
         </property>
+        <property name="buddy">
+         <cstring>lineNickname</cstring>
+        </property>
        </widget>
       </item>
       <item row="0" column="1">
@@ -84,6 +93,9 @@
         <property name="text">
          <string>Username</string>
         </property>
+        <property name="buddy">
+         <cstring>lineUsername</cstring>
+        </property>
        </widget>
       </item>
       <item row="0" column="1">
@@ -93,6 +105,9 @@
        <widget class="QLabel" name="labelPassword">
         <property name="text">
          <string>Password</string>
+        </property>
+        <property name="buddy">
+         <cstring>linePassword</cstring>
         </property>
        </widget>
       </item>
@@ -128,6 +143,9 @@
    </property>
    <property name="text">
     <string>Server</string>
+   </property>
+   <property name="buddy">
+    <cstring>lineServer</cstring>
    </property>
   </widget>
  </widget>

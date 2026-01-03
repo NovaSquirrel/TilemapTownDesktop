@@ -101,15 +101,14 @@ void network_finish() {
 
 #ifdef USING_QT
 int TilemapTownClient::websocket_connect(std::string server) {
-    this->websocket.disconnect();
     this->map_received = false;
-    connect(&this->websocket, &QWebSocket::connected, this, &TilemapTownClient::onWebSocketConnected);
-    connect(&this->websocket, &QWebSocket::disconnected, this, &TilemapTownClient::onWebSocketDisconnected);
-    connect(&this->websocket, &QWebSocket::errorOccurred, this, &TilemapTownClient::onWebSocketError);
+    connect(&this->websocket, &QWebSocket::connected, this, &TilemapTownClient::onWebSocketConnected, Qt::UniqueConnection);
+    connect(&this->websocket, &QWebSocket::disconnected, this, &TilemapTownClient::onWebSocketDisconnected, Qt::UniqueConnection);
+    connect(&this->websocket, &QWebSocket::errorOccurred, this, &TilemapTownClient::onWebSocketError, Qt::UniqueConnection);
     connect(&this->websocket, QOverload<const QList<QSslError>&>::of(&QWebSocket::sslErrors),
-            this, &TilemapTownClient::onWebSocketSslErrors);
+            this, &TilemapTownClient::onWebSocketSslErrors, Qt::UniqueConnection);
     connect(&this->websocket, &QWebSocket::textMessageReceived,
-            this, &TilemapTownClient::onWebSocketTextMessageReceived);
+            this, &TilemapTownClient::onWebSocketTextMessageReceived, Qt::UniqueConnection);
 
     this->websocket.open(QString::fromStdString(server));
     return 1;

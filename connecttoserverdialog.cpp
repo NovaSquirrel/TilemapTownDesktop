@@ -7,6 +7,7 @@ ConnectToServerDialog::ConnectToServerDialog(QWidget *parent)
 {
     ui->setupUi(this);
     connect(this->ui->connectButton, &QPushButton::clicked, this, &ConnectToServerDialog::buttonClicked);
+    this->setFixedSize(size());
 }
 
 ConnectToServerDialog::~ConnectToServerDialog()
