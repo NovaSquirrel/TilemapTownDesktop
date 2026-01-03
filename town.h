@@ -213,6 +213,7 @@ public:
     float camera_x;
     float camera_y;
     bool walk_through_walls;
+    bool already_showed_sign, already_bumped;
 
     // Websocket functions
     int websocket_connect(std::string server);

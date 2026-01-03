@@ -611,7 +611,7 @@ void TilemapTownClient::move_player(int offset_x, int offset_y) {
         cell = &this->town_map.cells[new_y * this->town_map.width + new_x];
 
         turf = cell->turf.get(this);
-        if(turf && turf->type == MAP_TILE_SIGN) {
+        if(turf && turf->type == MAP_TILE_SIGN && !already_showed_sign) {
             //printf("\x1b[35m%s says: %s\x1b[0m\n", (turf->name=="sign" || turf->name.empty()) ? "The sign" : turf->name.c_str(), turf->message.c_str());
             std::string i_text, i_name;
             html_encode(i_name, turf->name.c_str());
@@ -619,6 +619,8 @@ void TilemapTownClient::move_player(int offset_x, int offset_y) {
             this->log_message(std::format("<span style=\"color:pink;\">{} says: {}</span>", (i_name=="sign" || i_name.empty()) ? "The sign" : i_name, i_text), "server_message");
         }
         if(turf && (turf->walls & dense_wall_bit) && !this->walk_through_walls) {
+            if (turf && turf->type == MAP_TILE_SIGN)
+                already_showed_sign = true;
             // Go back
             bumped = true;
             bumped_x = you->x;
@@ -631,12 +633,13 @@ void TilemapTownClient::move_player(int offset_x, int offset_y) {
             MapTileInfo *obj = obj_reference.get(this);
             if(!obj)
                 continue;
-            if(obj->type == MAP_TILE_SIGN) {
+            if(obj->type == MAP_TILE_SIGN && !already_showed_sign) {
                 //printf("\x1b[35m%s says: %s\x1b[0m\n", (obj->name=="sign" || obj->name.empty()) ? "The sign" : obj->name.c_str(), obj->message.c_str());
                 std::string i_text, i_name;
                 html_encode(i_name, obj->name.c_str());
                 html_encode(i_text, obj->message.c_str());
                 this->log_message(std::format("<span style=\"color:pink;\">{} says: {}</span>", (i_name=="sign" || i_name.empty()) ? "The sign" : i_name, i_text), "server_message");
+                this->already_showed_sign = true;
             }
             if((obj->walls & dense_wall_bit) && !this->walk_through_walls) {
                 if(!bumped) {
@@ -644,6 +647,8 @@ void TilemapTownClient::move_player(int offset_x, int offset_y) {
                     bumped_x = you->x;
                     bumped_y = you->y;
                 }
+                if(obj->type == MAP_TILE_SIGN)
+                    this->already_showed_sign = true;
                 // Go back
                 you->x = original_x;
                 you->y = original_y;
@@ -663,7 +668,9 @@ void TilemapTownClient::move_player(int offset_x, int offset_y) {
         int to_array[2] = {you->x, you->y};
         cJSON *json_to = cJSON_CreateIntArray(to_array, 2);
         cJSON_AddItemToObject(json, "to", json_to);
-    } else {
+    } else if(!this->already_bumped) {
+        this->already_bumped = true;
+
         int bump_array[2] = {bumped_x, bumped_y};
         cJSON *json_bump = cJSON_CreateIntArray(bump_array, 2);
         cJSON_AddItemToObject(json, "bump", json_bump);

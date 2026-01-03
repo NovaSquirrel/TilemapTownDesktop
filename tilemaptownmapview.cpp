@@ -224,10 +224,18 @@ void TilemapTownMapView::paintEvent(QPaintEvent *)
     }
 }
 
+void resetSignFlag(TilemapTownClient *client, QKeyEvent *event) {
+    if (!event->isAutoRepeat()) {
+        client->already_showed_sign = false;
+        client->already_bumped = false;
+    }
+}
+
 void TilemapTownMapView::keyPressEvent(QKeyEvent* event) {
     switch (event->key()) {
     case Qt::Key_Left:
     case Qt::Key_A:
+        resetSignFlag(this->tilemapTownClient, event);
         if (event->modifiers() == Qt::ShiftModifier) {
             this->tilemapTownClient->turn_player(4);
         } else if (event->modifiers() == Qt::ControlModifier) {
@@ -240,6 +248,7 @@ void TilemapTownMapView::keyPressEvent(QKeyEvent* event) {
         break;
     case Qt::Key_Right:
     case Qt::Key_D:
+        resetSignFlag(this->tilemapTownClient, event);
         if (event->modifiers() == Qt::ShiftModifier) {
             this->tilemapTownClient->turn_player(0);
         } else if (event->modifiers() == Qt::ControlModifier) {
@@ -252,6 +261,7 @@ void TilemapTownMapView::keyPressEvent(QKeyEvent* event) {
         break;
     case Qt::Key_Up:
     case Qt::Key_W:
+        resetSignFlag(this->tilemapTownClient, event);
         if (event->modifiers() == Qt::ShiftModifier) {
             this->tilemapTownClient->turn_player(6);
         } else if (event->modifiers() == Qt::ControlModifier) {
@@ -264,6 +274,7 @@ void TilemapTownMapView::keyPressEvent(QKeyEvent* event) {
         break;
     case Qt::Key_Down:
     case Qt::Key_S:
+        resetSignFlag(this->tilemapTownClient, event);
         if (event->modifiers() == Qt::ShiftModifier) {
             this->tilemapTownClient->turn_player(2);
         } else if (event->modifiers() == Qt::ControlModifier) {
@@ -275,6 +286,7 @@ void TilemapTownMapView::keyPressEvent(QKeyEvent* event) {
         this->update();
         break;
     case Qt::Key_PageUp:
+        resetSignFlag(this->tilemapTownClient, event);
         if (event->modifiers() == Qt::ShiftModifier) {
             this->tilemapTownClient->turn_player(7);
         } else if (event->modifiers() == Qt::ControlModifier) {
@@ -286,6 +298,7 @@ void TilemapTownMapView::keyPressEvent(QKeyEvent* event) {
         this->update();
         break;
     case Qt::Key_PageDown:
+        resetSignFlag(this->tilemapTownClient, event);
         if (event->modifiers() == Qt::ShiftModifier) {
             this->tilemapTownClient->turn_player(1);
         } else if (event->modifiers() == Qt::ControlModifier) {
@@ -297,6 +310,7 @@ void TilemapTownMapView::keyPressEvent(QKeyEvent* event) {
         this->update();
         break;
     case Qt::Key_End:
+        resetSignFlag(this->tilemapTownClient, event);
         if (event->modifiers() == Qt::ShiftModifier) {
             this->tilemapTownClient->turn_player(3);
         } else if (event->modifiers() == Qt::ControlModifier) {
@@ -308,6 +322,7 @@ void TilemapTownMapView::keyPressEvent(QKeyEvent* event) {
         this->update();
         break;
     case Qt::Key_Home:
+        resetSignFlag(this->tilemapTownClient, event);
         if (event->modifiers() == Qt::ShiftModifier) {
             this->tilemapTownClient->turn_player(5);
         } else if (event->modifiers() == Qt::ControlModifier) {
