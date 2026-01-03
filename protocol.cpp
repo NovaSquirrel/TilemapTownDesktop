@@ -684,12 +684,41 @@ void TilemapTownClient::websocket_message(const char *text, size_t length) {
 
         cJSON *i_update = get_json_item(json, "update");
         if(cJSON_IsObject(i_update)) {
-            cJSON *i_id = get_json_item(i_add, "id");
+            cJSON *i_id = get_json_item(i_update, "id");
             if(!i_id) break;
 
             auto it = this->who.find(json_as_string(i_id));
             if(it != this->who.end()) {
-                (*it).second.apply_json(i_update);
+                std::string id = (*it).second.apply_json(i_update);
+
+                if (get_json_item(i_update, "status")) {
+                    const char *i_status = get_json_string(i_update, "status");
+                    const char *i_status_message = get_json_string(i_update, "status_message");
+                    std::string safe_name, safe_status = "", safe_message = "";
+                    html_encode(safe_name, (*it).second.name.c_str());
+                    if (i_status)
+                        html_encode(safe_status, i_status);
+                    if (i_status_message)
+                        html_encode(safe_message, i_status_message);
+
+                    if (id == this->your_id) {
+                        if (safe_status.empty()) {
+                            this->log_message("<span style=\"color:silver;\">Your status has been cleared</span>", "status_change");
+                        } else if (safe_message.empty()){
+                            this->log_message(std::format("<span style=\"color:silver;\">Your status is now \"{}\"</span>", safe_status), "status_change");
+                        } else {
+                            this->log_message(std::format("<span style=\"color:silver;\">Your status is now \"{}\" (\"{}\")</span>", safe_status, safe_message), "status_change");
+                        }
+                    } else {
+                        if (safe_status.empty()) {
+                            this->log_message(std::format("<span style=\"color:silver;\">{} cleared their status</span>", safe_name), "status_change");
+                        } else if (safe_message.empty()){
+                            this->log_message(std::format("<span style=\"color:silver;\">{}'s status is now \"{}\"</span>", safe_name, safe_status), "status_change");
+                        } else {
+                            this->log_message(std::format("<span style=\"color:silver;\">{}'s status is now \"{}\" (\"{}\")</span>", safe_name, safe_status, safe_message), "status_change");
+                        }
+                    }
+                }
             }
         }
 
