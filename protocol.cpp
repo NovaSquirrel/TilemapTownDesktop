@@ -706,6 +706,8 @@ void TilemapTownClient::websocket_message(const char *text, size_t length) {
                             this->log_message("<span style=\"color:silver;\">Your status has been cleared</span>", "status_change");
                         } else if (safe_message.empty()){
                             this->log_message(std::format("<span style=\"color:silver;\">Your status is now \"{}\"</span>", safe_status), "status_change");
+                        } else if (safe_status == "."){
+                            this->log_message(std::format("<span style=\"color:silver;\">Your status is now \"{}\"</span>", safe_message), "status_change");
                         } else {
                             this->log_message(std::format("<span style=\"color:silver;\">Your status is now \"{}\" (\"{}\")</span>", safe_status, safe_message), "status_change");
                         }
@@ -714,6 +716,8 @@ void TilemapTownClient::websocket_message(const char *text, size_t length) {
                             this->log_message(std::format("<span style=\"color:silver;\">{} cleared their status</span>", safe_name), "status_change");
                         } else if (safe_message.empty()){
                             this->log_message(std::format("<span style=\"color:silver;\">{}'s status is now \"{}\"</span>", safe_name, safe_status), "status_change");
+                        } else if (safe_status == ".") {
+                            this->log_message(std::format("<span style=\"color:silver;\">{}'s status is now \"{}\"</span>", safe_name, safe_message), "status_change");
                         } else {
                             this->log_message(std::format("<span style=\"color:silver;\">{}'s status is now \"{}\" (\"{}\")</span>", safe_name, safe_status, safe_message), "status_change");
                         }
