@@ -214,6 +214,7 @@ public:
     bool walk_through_walls;
 
     // Websocket functions
+    int websocket_connect(std::string server);
     int websocket_connect(std::string host, std::string path, std::string port);
     void websocket_disconnect();
     void network_update(); // Does nothing on Qt; on other platforms, it also runs HTTP transfers
@@ -246,9 +247,11 @@ public:
     // but on other platforms it may involve writing to global state somewhere.
 #ifndef USING_QT
     void log_message(const std::string text, const std::string style); // Directly writes to the chat log
+    void connected_to_server();
 #else
 signals:
     void log_message(const std::string text, const std::string style); // Sends a signal to the chat log
+    void connected_to_server();
 
     // Handle websocket events
 private Q_SLOTS:

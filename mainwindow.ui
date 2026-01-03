@@ -209,26 +209,41 @@ li.checked::marker { content: &quot;\2612&quot;; }
    </property>
   </action>
   <action name="actionBuild">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Build</string>
    </property>
   </action>
   <action name="actionInventory">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Inventory</string>
    </property>
   </action>
   <action name="actionFileUploads">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>File uploads</string>
    </property>
   </action>
   <action name="actionMapInformation">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Map information</string>
    </property>
   </action>
   <action name="actionMail">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Mail</string>
    </property>
@@ -244,23 +259,41 @@ li.checked::marker { content: &quot;\2612&quot;; }
    </property>
   </action>
   <action name="actionDebug_info">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Debug info</string>
    </property>
   </action>
   <action name="actionContents">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Contents</string>
    </property>
   </action>
   <action name="actionPreferences">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Preferences</string>
    </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::PreferencesRole</enum>
+   </property>
   </action>
   <action name="actionAbout">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>About</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::AboutRole</enum>
    </property>
   </action>
   <action name="actionSource_code">
@@ -269,6 +302,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
    </property>
   </action>
   <action name="actionCheck_for_updates">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Check for updates</string>
    </property>
@@ -290,6 +326,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
    </property>
   </action>
   <action name="actionList_of_users">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>List of users</string>
    </property>

@@ -39,6 +39,7 @@ find_package(Qt6 REQUIRED COMPONENTS Widgets Network WebSockets)
         chattextinput.h chattextinput.cpp
         townfilecache.cpp
         townfilecache.h
+        connecttoserverdialog.h connecttoserverdialog.cpp connecttoserverdialog.ui
 
     )
 # Define target properties for Android with Qt 6 as:

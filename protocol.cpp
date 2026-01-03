@@ -409,6 +409,8 @@ void TilemapTownClient::websocket_message(const char *text, size_t length) {
     case protocol_command_as_int('M', 'A', 'I'):
     {
         // <-- MAI {"name": map_name, "id": map_id, "owner": whoever, "admins": list, "default": default_turf, "size": [width, height], "public": true/false, "private": true/false, "build_enabled": true/false, "full_sandbox": true/false, "you_allow": list, "you_deny": list
+        if(get_json_item(json, "remote_map"))
+            break;
         this->json_tileset.clear();
         this->map_received = false;
 
@@ -639,6 +641,10 @@ void TilemapTownClient::websocket_message(const char *text, size_t length) {
 
     case protocol_command_as_int('W', 'H', 'O'):
     {
+        cJSON *i_type = get_json_item(json, "type");
+        if(i_type && !strcmp(i_type->valuestring, "map"))
+            break;
+
         cJSON *i_you = get_json_item(json, "you");
         if(i_you) {
             this->your_id = json_as_string(i_you);
@@ -933,9 +939,9 @@ void TilemapTownClient::login(const char *username, const char *password) {
     cJSON_AddItemToObjectCS(json_features, "bulk_build", json_features_bulk_build);
     cJSON_AddStringToObject(json_features_bulk_build, "version", "0.0.1");
 
-    if(username && password == nullptr) {
+    if(username && *username && (password == nullptr || !*password)) {
         cJSON_AddStringToObject(json, "name", username);
-    } else if(username && password) {
+    } else if(username && *username && password && *password) {
         cJSON_AddStringToObject(json, "username", username);
         cJSON_AddStringToObject(json, "password", password);
     }

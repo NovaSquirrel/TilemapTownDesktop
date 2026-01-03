@@ -58,11 +58,6 @@ struct wslay_event_callbacks wslay_callbacks = {
 static u32 *SOC_buffer = NULL;
 #endif
 
-// Login details
-extern char login_username[256];
-extern char login_password[256];
-extern bool guest_login;
-
 // ----------------------------------------------
 // - Initialization
 // ----------------------------------------------
@@ -105,8 +100,9 @@ void network_finish() {
 // ----------------------------------------------
 
 #ifdef USING_QT
-int TilemapTownClient::websocket_connect(std::string host, std::string path, std::string port) {
+int TilemapTownClient::websocket_connect(std::string server) {
     this->websocket.disconnect();
+    this->map_received = false;
     connect(&this->websocket, &QWebSocket::connected, this, &TilemapTownClient::onWebSocketConnected);
     connect(&this->websocket, &QWebSocket::disconnected, this, &TilemapTownClient::onWebSocketDisconnected);
     connect(&this->websocket, &QWebSocket::errorOccurred, this, &TilemapTownClient::onWebSocketError);
@@ -115,7 +111,7 @@ int TilemapTownClient::websocket_connect(std::string host, std::string path, std
     connect(&this->websocket, &QWebSocket::textMessageReceived,
             this, &TilemapTownClient::onWebSocketTextMessageReceived);
 
-    this->websocket.open(QString::fromStdString("wss://" + host + path + ":" + port));
+    this->websocket.open(QString::fromStdString(server));
     return 1;
 }
 
@@ -124,16 +120,19 @@ void TilemapTownClient::websocket_disconnect() {
 }
 
 void TilemapTownClient::onWebSocketConnected() {
+    log_message("Connected to server", "");
     this->connected = true;
-    this->login("qt", nullptr);
+    this->connected_to_server();
 }
 
 void TilemapTownClient::onWebSocketDisconnected() {
     this->connected = false;
+    log_message("Disconnected from server", "");
 }
 
 void TilemapTownClient::onWebSocketError(QAbstractSocket::SocketError error) {
     qWarning() << "Websocket error:" << error;
+    log_message("Websocket error", "");
 }
 
 void TilemapTownClient::onWebSocketTextMessageReceived(QString message) {
@@ -143,8 +142,14 @@ void TilemapTownClient::onWebSocketTextMessageReceived(QString message) {
 
 void TilemapTownClient::onWebSocketSslErrors(const QList<QSslError> &errors) {
     qWarning() << "SSL errors:" << errors;
+    log_message("SSL error", "");
 }
 #else
+// Login details
+extern char login_username[256];
+extern char login_password[256];
+extern bool guest_login;
+
 static void my_debug(void *ctx, int level,
                      const char *file, int line,
                      const char *str) {

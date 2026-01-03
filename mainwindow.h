@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include "town.h"
 #include "townfilecache.h"
+#include "connecttoserverdialog.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -24,10 +25,21 @@ public:
 
 private slots:
     void on_actionConnect_to_a_server_triggered();
+    void on_actionSource_code_triggered();
+    void on_actionQuit_triggered();
+    void on_actionDisconnect_triggered();
+    void on_actionReconnect_triggered();
     void on_textInput_returnPressed();
     void logMessage(std::string text, std::string style);
+    void didConnectToServerDialog(QString websocket_server, QString town_nickname, QString town_username, QString town_password, bool guest_mode);
+    void connected_to_server();
 
 private:
     Ui::MainWindow *ui;
+    ConnectToServerDialog connectToServerDialog;
+
+    // Connection variables
+    QString websocket_server, town_nickname, town_username, town_password;
+    bool guest_mode = true;
 };
 #endif // MAINWINDOW_H

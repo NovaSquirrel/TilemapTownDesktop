@@ -64,7 +64,7 @@ void TilemapTownMapView::drawMapTile(QPainter *painter, const MapTileInfo *tile,
 
 void TilemapTownMapView::paintEvent(QPaintEvent *)
 {
-    if (this->tilemapTownClient == nullptr)
+    if (this->tilemapTownClient == nullptr || !this->tilemapTownClient->map_received)
         return;
 
     const int scale = 2;
