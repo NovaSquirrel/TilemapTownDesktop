@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>Tilemap Town Desktop</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <property name="sizePolicy">
@@ -42,10 +42,26 @@
     </item>
     <item>
      <widget class="QSplitter" name="mapAndChatSplitter">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
       <property name="orientation">
        <enum>Qt::Orientation::Horizontal</enum>
       </property>
-      <widget class="TilemapTownMapView" name="tilemapTownMapView" native="true"/>
+      <widget class="TilemapTownMapView" name="tilemapTownMapView" native="true">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+         <horstretch>1</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="focusPolicy">
+        <enum>Qt::FocusPolicy::StrongFocus</enum>
+       </property>
+      </widget>
       <widget class="QSplitter" name="chatViewInputSplitter">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
@@ -74,7 +90,7 @@ hr { height: 1px; border-width: 0; }
 li.unchecked::marker { content: &quot;\2610&quot;; }
 li.checked::marker { content: &quot;\2612&quot;; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Segoe UI'; font-size:9pt; font-weight:400; font-style:normal;&quot; bgcolor=&quot;#333333&quot;&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; color:#ffffff;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
         <property name="textInteractionFlags">
          <set>Qt::TextInteractionFlag::TextSelectableByKeyboard|Qt::TextInteractionFlag::TextSelectableByMouse</set>
@@ -115,7 +131,11 @@ li.checked::marker { content: &quot;\2612&quot;; }
     </item>
    </layout>
   </widget>
-  <widget class="QStatusBar" name="statusbar"/>
+  <widget class="QStatusBar" name="statusbar">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+  </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
@@ -144,6 +164,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
      <string>Settings</string>
     </property>
     <addaction name="actionPreferences"/>
+    <addaction name="actionWalk_through_walls"/>
    </widget>
    <widget class="QMenu" name="menuWindow">
     <property name="title">
@@ -171,6 +192,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
      <string>View</string>
     </property>
     <widget class="QMenu" name="menuAnimation">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="title">
       <string>Animation</string>
      </property>
@@ -389,6 +413,14 @@ li.checked::marker { content: &quot;\2612&quot;; }
     <string>Ctrl+0</string>
    </property>
   </action>
+  <action name="actionWalk_through_walls">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Walk through walls</string>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>
@@ -396,6 +428,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
    <extends>QWidget</extends>
    <header>tilemaptownmapview.h</header>
    <container>1</container>
+   <slots>
+    <signal>focusChat()</signal>
+   </slots>
   </customwidget>
   <customwidget>
    <class>QTabBar</class>

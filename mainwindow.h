@@ -30,9 +30,15 @@ private slots:
     void on_actionDisconnect_triggered();
     void on_actionReconnect_triggered();
     void on_textInput_returnPressed();
+    void on_actionZoom_out_triggered();
+    void on_actionZoom_in_triggered();
+    void on_actionReset_zoom_triggered();
+    void on_actionWalk_through_walls_triggered();
+    void on_tilemapTownMapView_focusChat();
     void logMessage(std::string text, std::string style);
     void didConnectToServerDialog(QString websocket_server, QString town_nickname, QString town_username, QString town_password, bool guest_mode);
     void connected_to_server();
+    void want_redraw();
 
 private:
     Ui::MainWindow *ui;

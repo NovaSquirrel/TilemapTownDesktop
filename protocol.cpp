@@ -342,6 +342,7 @@ void TilemapTownClient::websocket_message(const char *text, size_t length) {
     if(length > 4) {
         // Batch messages need special parsing
         if(text[0] == 'B' && text[1] == 'A' && text[2] == 'T' && text[3] == ' ') {
+            this->in_batch = true;
             size_t base = 4, scan = 4;
             while(scan < length) {
                 if(text[scan] == '\n') {
@@ -351,6 +352,11 @@ void TilemapTownClient::websocket_message(const char *text, size_t length) {
                 scan++;
             }
             this->websocket_message(text+base, scan-base);
+            this->in_batch = false;
+            if (this->need_redraw) {
+                this->request_draw();
+                this->need_redraw = false;
+            }
             return;
         } else {
             json = cJSON_ParseWithLength(text+4, length-4);
@@ -403,6 +409,7 @@ void TilemapTownClient::websocket_message(const char *text, size_t length) {
                 entity->update_direction(i_dir->valueint);
             }
         }
+        this->need_redraw = true;
         break;
     }
 
@@ -496,7 +503,7 @@ void TilemapTownClient::websocket_message(const char *text, size_t length) {
                 }
             }
         }
-
+        this->need_redraw = true;
         break;
     }
     case protocol_command_as_int('B', 'L', 'K'):
@@ -635,7 +642,7 @@ void TilemapTownClient::websocket_message(const char *text, size_t length) {
                 }
             }
         }
-
+        this->need_redraw = true;
         break;
     }
 
@@ -708,6 +715,7 @@ void TilemapTownClient::websocket_message(const char *text, size_t length) {
                 this->who.erase(str_id);
             }
         }
+        this->need_redraw = true;
         break;
     }
 
@@ -886,6 +894,10 @@ void TilemapTownClient::websocket_message(const char *text, size_t length) {
 
     if(json)
         cJSON_Delete(json);
+    if(this->need_redraw && !this->in_batch) {
+        this->request_draw();
+        this->need_redraw = false;
+    }
 }
 
 void TilemapTownClient::websocket_write(std::string command, cJSON *json) {
@@ -951,6 +963,7 @@ void TilemapTownClient::login(const char *username, const char *password) {
     #elif defined(USING_QT)
     cJSON_AddStringToObject(json, "client_name", "Tilemap Town Desktop Client");
     #endif
+    cJSON_AddStringToObject(json, "client_version", "0.0.1");
 
     this->websocket_write("IDN", json);
     cJSON_Delete(json);

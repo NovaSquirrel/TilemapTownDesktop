@@ -61,7 +61,7 @@ public:
 #ifdef USING_QT
 signals:
 #endif
-    void want_redraw();
+    void request_redraw();
 
 /////////////////////////////////////////////////
 

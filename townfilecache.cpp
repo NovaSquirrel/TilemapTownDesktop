@@ -8,7 +8,7 @@ void TownFileCache::onFileDownloaded(QNetworkReply* reply) {
     QPixmap image;
     image.loadFromData(reply->readAll());
     this->image_for_url[reply->url().toString().toStdString()] = image;
-    emit this->want_redraw();
+    emit this->request_redraw();
 
     reply->deleteLater();
 }

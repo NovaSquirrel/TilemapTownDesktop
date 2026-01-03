@@ -1,4 +1,5 @@
 #include <QDesktopServices>
+#include <ctime>
 #include "mainwindow.h"
 #include "cJSON.h"
 #include "./ui_mainwindow.h"
@@ -9,6 +10,8 @@ MainWindow::MainWindow(QWidget *parent)
 {
     connect(&this->tilemapTownClient, &TilemapTownClient::log_message, this, &MainWindow::logMessage);
     connect(&this->tilemapTownClient, &TilemapTownClient::connected_to_server, this, &MainWindow::connected_to_server);
+    connect(&this->tilemapTownClient, &TilemapTownClient::request_draw, this, &MainWindow::want_redraw);
+    connect(&this->townFileCache,     &TownFileCache::request_redraw, this, &MainWindow::want_redraw);
     this->tilemapTownClient.http = &this->townFileCache;
 
     // Set up tabs and UI
@@ -64,11 +67,46 @@ void MainWindow::on_actionDisconnect_triggered()
     this->tilemapTownClient.websocket_disconnect();
 }
 
+
+void MainWindow::on_actionZoom_out_triggered()
+{
+    this->ui->tilemapTownMapView->scale -= 1;
+    if (this->ui->tilemapTownMapView->scale < 1)
+        this->ui->tilemapTownMapView->scale = 1;
+    this->ui->tilemapTownMapView->update();
+}
+
+
+void MainWindow::on_actionZoom_in_triggered()
+{
+    this->ui->tilemapTownMapView->scale += 1;
+    this->ui->tilemapTownMapView->update();
+}
+
+
+void MainWindow::on_actionReset_zoom_triggered()
+{
+    this->ui->tilemapTownMapView->scale = 2;
+    this->ui->tilemapTownMapView->update();
+}
+
+void MainWindow::on_actionWalk_through_walls_triggered()
+{
+    this->tilemapTownClient.walk_through_walls = this->ui->actionWalk_through_walls->isChecked();
+}
+
+void MainWindow::want_redraw()
+{
+    this->ui->tilemapTownMapView->update();
+}
+
 void MainWindow::on_textInput_returnPressed()
 {
     QString text = ui->textInput->toPlainText();
-    if (text.length() == 0)
+    if (text.length() == 0) {
+        ui->tilemapTownMapView->setFocus();
         return;
+    }
 
     cJSON *json = cJSON_CreateObject();
     if(text == "/clear") {
@@ -88,8 +126,19 @@ void MainWindow::on_textInput_returnPressed()
     ui->textInput->clear();
 }
 
+void MainWindow::on_tilemapTownMapView_focusChat()
+{
+    this->ui->textInput->setFocus();
+}
+
+
 void MainWindow::logMessage(std::string text, std::string style) {
-    ui->chatLog->append(QString::fromStdString((text)));
+    std::time_t t = std::time(nullptr);
+    std::tm tm = *std::localtime(&t);
+    std::stringstream buffer;
+    buffer << std::put_time(&tm, "%I:%M %p");
+    std::string with_timestamp = std::format("<span style=\"color:silver;font-size: 10px;\">{}</span> {}", buffer.str(), text);
+    ui->chatLog->append(QString::fromStdString(with_timestamp));
 }
 
 void MainWindow::connected_to_server() {

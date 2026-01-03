@@ -19,6 +19,8 @@
 #include "town.h"
 #include "cJSON.h"
 
+void html_encode(std::string& out, const char *in);
+
 using namespace std;
 
 void TownMap::init_map(int width, int height) {
@@ -610,7 +612,11 @@ void TilemapTownClient::move_player(int offset_x, int offset_y) {
 
         turf = cell->turf.get(this);
         if(turf && turf->type == MAP_TILE_SIGN) {
-            printf("\x1b[35m%s says: %s\x1b[0m\n", (turf->name=="sign" || turf->name.empty()) ? "The sign" : turf->name.c_str(), turf->message.c_str());
+            //printf("\x1b[35m%s says: %s\x1b[0m\n", (turf->name=="sign" || turf->name.empty()) ? "The sign" : turf->name.c_str(), turf->message.c_str());
+            std::string i_text, i_name;
+            html_encode(i_name, turf->name.c_str());
+            html_encode(i_text, turf->message.c_str());
+            this->log_message(std::format("<span style=\"color:pink;\">{} says: {}</span>", (i_name=="sign" || i_name.empty()) ? "The sign" : i_name, i_text), "server_message");
         }
         if(turf && (turf->walls & dense_wall_bit) && !this->walk_through_walls) {
             // Go back
@@ -626,7 +632,11 @@ void TilemapTownClient::move_player(int offset_x, int offset_y) {
             if(!obj)
                 continue;
             if(obj->type == MAP_TILE_SIGN) {
-                printf("\x1b[35m%s says: %s\x1b[0m\n", (obj->name=="sign" || obj->name.empty()) ? "The sign" : obj->name.c_str(), obj->message.c_str());
+                //printf("\x1b[35m%s says: %s\x1b[0m\n", (obj->name=="sign" || obj->name.empty()) ? "The sign" : obj->name.c_str(), obj->message.c_str());
+                std::string i_text, i_name;
+                html_encode(i_name, obj->name.c_str());
+                html_encode(i_text, obj->message.c_str());
+                this->log_message(std::format("<span style=\"color:pink;\">{} says: {}</span>", (i_name=="sign" || i_name.empty()) ? "The sign" : i_name, i_text), "server_message");
             }
             if((obj->walls & dense_wall_bit) && !this->walk_through_walls) {
                 if(!bumped) {
@@ -669,6 +679,37 @@ void TilemapTownClient::move_player(int offset_x, int offset_y) {
     cJSON_Delete(json);
 
     you->walk_timer = 30+1; // 30*(16.6666ms/1000) = 0.5
+}
+
+void TilemapTownClient::offset_player(int offset_change_x, int offset_change_y) {
+    Entity *you = this->your_entity();
+    if(!you)
+        return;
+
+    int old_offset_x = you->offset_x;
+    int old_offset_y = you->offset_y;
+    int new_offset_x = old_offset_x + offset_change_x;
+    int new_offset_y = old_offset_y + offset_change_y;
+    if (new_offset_x < -32)
+        new_offset_x = -32;
+    if (new_offset_x > 32)
+        new_offset_x = 32;
+    if (new_offset_y < -32)
+        new_offset_y = -32;
+    if (new_offset_y > 32)
+        new_offset_y = 32;
+    if (old_offset_x == new_offset_x && old_offset_y == new_offset_y)
+        return;
+    you->offset_x = new_offset_x;
+    you->offset_y = new_offset_y;
+
+    cJSON *json = cJSON_CreateObject();
+    int offset_array[2] = {new_offset_x, new_offset_y};
+    cJSON *json_bump = cJSON_CreateIntArray(offset_array, 2);
+    cJSON_AddItemToObject(json, "offset", json_bump);
+
+    this->websocket_write("MOV", json);
+    cJSON_Delete(json);
 }
 
 void Entity::update_direction(int direction) {

@@ -28,12 +28,15 @@ class TilemapTownMapView : public QWidget
 public:
     explicit TilemapTownMapView(QWidget *parent = nullptr);
     TilemapTownClient *tilemapTownClient;
+    int scale = 2;
 
 protected:
     void paintEvent(QPaintEvent *event) override;
+    void keyPressEvent(QKeyEvent* event) override;
 private:
     void drawMapTile(QPainter *painter, const MapTileInfo *tiletile, bool obj, int map_x, int map_y, float draw_x, float draw_y, int scale);
 signals:
+    void focusChat();
 };
 
 #endif // TILEMAPTOWNMAPVIEW_H

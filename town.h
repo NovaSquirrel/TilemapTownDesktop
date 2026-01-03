@@ -205,6 +205,7 @@ public:
 
     bool map_received;
     bool need_redraw;
+    bool in_batch = false; // Currently processing a batch message
     int animation_tick;
 
     // Player state
@@ -217,7 +218,7 @@ public:
     int websocket_connect(std::string server);
     int websocket_connect(std::string host, std::string path, std::string port);
     void websocket_disconnect();
-    void network_update(); // Does nothing on Qt; on other platforms, it also runs HTTP transfers
+    void network_update(); // Does nothing on Qt; on other platforms, it checks on the sockets and runs HTTP transfers
     void websocket_write(std::string text);
     void websocket_write(std::string command, cJSON *json);
     void websocket_message(const char *text, size_t length);
@@ -230,6 +231,7 @@ public:
     void login(const char *username, const char *password);
     void turn_player(int direction);
     void move_player(int offset_x, int offset_y);
+    void offset_player(int offset_x, int offset_y);
     void request_image_asset(std::string key);
     void request_tileset_asset(std::string key);
 
@@ -248,10 +250,12 @@ public:
 #ifndef USING_QT
     void log_message(const std::string text, const std::string style); // Directly writes to the chat log
     void connected_to_server();
+    void want_redraw();
 #else
 signals:
     void log_message(const std::string text, const std::string style); // Sends a signal to the chat log
     void connected_to_server();
+    void request_draw();
 
     // Handle websocket events
 private Q_SLOTS:
