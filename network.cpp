@@ -110,7 +110,7 @@ int TilemapTownClient::websocket_connect(std::string server) {
     connect(&this->websocket, &QWebSocket::textMessageReceived,
             this, &TilemapTownClient::onWebSocketTextMessageReceived, Qt::UniqueConnection);
 
-    this->websocket.open(QString::fromStdString(server));
+    this->websocket.open(QString::fromUtf8(server));
     return 1;
 }
 
@@ -465,7 +465,7 @@ void HttpFileCache::get(std::string url, void (*callback) (const char *url, uint
 
 #ifdef USING_QT
 void TilemapTownClient::websocket_write(std::string text) {
-    this->websocket.sendTextMessage(QString::fromStdString(text));
+    this->websocket.sendTextMessage(QString::fromUtf8(text));
 }
 #else
 ssize_t wslay_recv(wslay_event_context_ptr ctx, uint8_t *data, size_t len, int flags, void *user_data) {

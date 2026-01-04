@@ -17,8 +17,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     // Set up tabs and UI
     ui->setupUi(this);
-    ui->tabCharacters->addTab("Character");
-    int tabAll = ui->tabChatChannels->addTab("All");
+    this->characterTabIndex = ui->tabCharacters->addTab("Character");
+    /*int tabAll =*/ ui->tabChatChannels->addTab("All");
     //int tabFocus = ui->tabChatChannels->addTab("Focus");
     ui->tabChatChannels->setTabsClosable(true);
 
@@ -100,6 +100,13 @@ void MainWindow::want_redraw()
 {
     this->ui->tilemapTownMapView->update();
     this->on_tilemapTownMapView_movedPlayer();
+    Entity *me = this->tilemapTownClient.your_entity();
+    if (!me)
+        return;
+    QString tabText = QString::fromUtf8(me->name);
+    if(this->ui->tabCharacters->tabText(this->characterTabIndex) != tabText) {
+        this->ui->tabCharacters->setTabText(this->characterTabIndex, QString::fromUtf8(me->name));
+    }
 }
 
 void MainWindow::on_textInput_returnPressed()
@@ -149,7 +156,7 @@ void MainWindow::logMessage(std::string text, std::string style) {
     std::stringstream buffer;
     buffer << std::put_time(&tm, "%I:%M %p");
     std::string with_timestamp = std::format("<span style=\"color:silver;font-size: 10px;\">{}</span> {}", buffer.str(), text);
-    ui->chatLog->append(QString::fromStdString(with_timestamp));
+    ui->chatLog->append(QString::fromUtf8(with_timestamp));
 }
 
 void MainWindow::connected_to_server() {

@@ -21,7 +21,7 @@ QPixmap *TownFileCache::get_pixmap(const std::string &url) {
         }
         this->requested_urls.insert(url);
 
-        QNetworkRequest request((QUrl(QString::fromStdString(url))));
+        QNetworkRequest request((QUrl(QString::fromUtf8(url))));
         this->network_access_manager.get(request);
         return nullptr;
     }

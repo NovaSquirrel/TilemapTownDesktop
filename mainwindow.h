@@ -48,5 +48,6 @@ private:
     // Connection variables
     QString websocket_server, town_nickname, town_username, town_password;
     bool guest_mode = true;
+    int characterTabIndex;
 };
 #endif // MAINWINDOW_H
