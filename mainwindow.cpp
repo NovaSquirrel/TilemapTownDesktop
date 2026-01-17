@@ -23,7 +23,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->tabChatChannels->setTabsClosable(true);
 
     // Initialize server settings
-    this->websocket_server = "wss://novasquirrel.com/townws/:443";
+    this->websocket_server = "wss://tilemap.town/ws/:443";
     this->town_nickname = "qt";
     this->town_username = "";
     this->town_password = "";
